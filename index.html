@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNS Lookup</title>
+<style>
+  :root { color-scheme: dark light; }
+  body {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    background: #0d1117;
+    color: #e6edf3;
+    line-height: 1.5;
+  }
+  h1 { font-size: 1.4rem; }
+  .card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+  }
+  .row { display: flex; gap: 0.5rem; margin: 0.5rem 0; }
+  input {
+    flex: 1;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    color: #e6edf3;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font: inherit;
+  }
+  button {
+    background: #238636;
+    color: #fff;
+    border: 0;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+  }
+  button:hover { background: #2ea043; }
+  .label { color: #8b949e; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .value { word-break: break-all; }
+  pre {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 0.75rem;
+    overflow-x: auto;
+    margin: 0.25rem 0;
+  }
+  .err { color: #f85149; }
+  .muted { color: #8b949e; font-size: 0.85rem; }
+  a { color: #58a6ff; }
+</style>
+</head>
+<body>
+  <h1>DNS Lookup</h1>
+  <p class="muted">Resolves DNS records via Cloudflare DNS-over-HTTPS (1.1.1.1).</p>
+
+  <div class="card">
+    <div class="row">
+      <input id="query" type="text" placeholder="IP address or hostname" value="108.181.32.77" />
+      <button id="go">Lookup</button>
+    </div>
+    <div class="muted">Examples: <code>108.181.32.77</code>, <code>github.com</code>, <code>1.1.1.1</code></div>
+  </div>
+
+  <div id="results"></div>
+
+<script>
+const DOH = 'https://cloudflare-dns.com/dns-query';
+
+const isIPv4 = s => /^(\d{1,3}\.){3}\d{1,3}$/.test(s) && s.split('.').every(o => +o >= 0 && +o <= 255);
+const isIPv6 = s => s.includes(':') && /^[0-9a-fA-F:]+$/.test(s);
+
+function ipv4ToArpa(ip) {
+  return ip.split('.').reverse().join('.') + '.in-addr.arpa';
+}
+
+function ipv6ToArpa(ip) {
+  // expand
+  let parts = ip.split('::');
+  let head = parts[0] ? parts[0].split(':') : [];
+  let tail = parts[1] ? parts[1].split(':') : [];
+  let missing = 8 - head.length - tail.length;
+  let full = [...head, ...Array(missing).fill('0'), ...tail]
+    .map(p => p.padStart(4, '0')).join('');
+  return full.split('').reverse().join('.') + '.ip6.arpa';
+}
+
+async function doh(name, type) {
+  const url = `${DOH}?name=${encodeURIComponent(name)}&type=${type}`;
+  const res = await fetch(url, { headers: { 'Accept': 'application/dns-json' } });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+function renderRecords(title, data) {
+  const answers = (data && data.Answer) || [];
+  if (!answers.length) {
+    return `<div class="row"><span class="label">${title}</span></div>
+            <div class="muted">No records.</div>`;
+  }
+  const lines = answers.map(a => `${a.name}  ${a.TTL}  ${typeName(a.type)}  ${a.data}`).join('\n');
+  return `<div class="label">${title}</div><pre>${escapeHtml(lines)}</pre>`;
+}
+
+function typeName(n) {
+  return ({1:'A',2:'NS',5:'CNAME',6:'SOA',12:'PTR',15:'MX',16:'TXT',28:'AAAA',33:'SRV',257:'CAA'})[n] || String(n);
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function lookup(input) {
+  const results = document.getElementById('results');
+  const target = input.trim();
+  if (!target) return;
+
+  results.innerHTML = `<div class="card">Looking up <strong>${escapeHtml(target)}</strong>...</div>`;
+
+  try {
+    let html = `<div class="card"><div class="label">Query</div><div class="value">${escapeHtml(target)}</div>`;
+
+    if (isIPv4(target) || isIPv6(target)) {
+      const arpa = isIPv4(target) ? ipv4ToArpa(target) : ipv6ToArpa(target);
+      html += `<div class="label" style="margin-top:0.75rem">Reverse DNS (PTR)</div>`;
+      const ptr = await doh(arpa, 'PTR');
+      const names = (ptr.Answer || []).filter(a => a.type === 12).map(a => a.data);
+      if (names.length) {
+        html += `<pre>${escapeHtml(names.join('\n'))}</pre>`;
+        // Forward-lookup the first PTR hostname for context
+        const host = names[0].replace(/\.$/, '');
+        const [a, aaaa] = await Promise.all([doh(host, 'A'), doh(host, 'AAAA')]);
+        html += `<div class="label" style="margin-top:0.75rem">Forward A for ${escapeHtml(host)}</div>`;
+        html += renderRecords('A records', a);
+        html += renderRecords('AAAA records', aaaa);
+      } else {
+        html += `<div class="muted">No PTR record found.</div>`;
+      }
+    } else {
+      const [a, aaaa, mx, ns, txt, cname] = await Promise.all([
+        doh(target, 'A'),
+        doh(target, 'AAAA'),
+        doh(target, 'MX'),
+        doh(target, 'NS'),
+        doh(target, 'TXT'),
+        doh(target, 'CNAME'),
+      ]);
+      html += renderRecords('A', a);
+      html += renderRecords('AAAA', aaaa);
+      html += renderRecords('CNAME', cname);
+      html += renderRecords('MX', mx);
+      html += renderRecords('NS', ns);
+      html += renderRecords('TXT', txt);
+    }
+
+    html += `</div>`;
+    results.innerHTML = html;
+  } catch (e) {
+    results.innerHTML = `<div class="card err">Error: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+document.getElementById('go').addEventListener('click', () => {
+  lookup(document.getElementById('query').value);
+});
+document.getElementById('query').addEventListener('keydown', e => {
+  if (e.key === 'Enter') lookup(e.target.value);
+});
+
+// Auto-run for the default IP on load.
+lookup(document.getElementById('query').value);
+</script>
+</body>
+</html>
