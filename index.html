@@ -3,66 +3,1409 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rammerhead Deploy</title>
+<title>ZXL Learning | Zenless Zone Zero Character Recognition</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23e63946'/%3E%3Ctext x='50' y='68' font-family='Arial Black' font-size='58' fill='white' text-anchor='middle' font-weight='900'%3EZ%3C/text%3E%3C/svg%3E">
 <style>
-  :root { color-scheme: dark light; }
+  :root {
+    --ixl-red: #e63946;
+    --ixl-dark-red: #c1272d;
+    --ixl-green: #5cb85c;
+    --ixl-dark-green: #449d44;
+    --ixl-blue: #4ba1f1;
+    --ixl-yellow: #ffc107;
+    --ixl-gray: #f5f5f5;
+    --ixl-text: #333;
+    --ixl-border: #d0d0d0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    max-width: 720px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    background: #0d1117;
-    color: #e6edf3;
-    line-height: 1.6;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--ixl-gray);
+    color: var(--ixl-text);
+    line-height: 1.5;
+    min-height: 100vh;
   }
-  h1 { font-size: 1.5rem; }
-  h2 { font-size: 1.1rem; margin-top: 2rem; color: #8b949e; text-transform: uppercase; letter-spacing: 0.05em; }
-  a { color: #58a6ff; }
-  code, pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; }
-  code { padding: 0.1rem 0.4rem; }
-  pre { padding: 0.75rem; overflow-x: auto; }
-  .btn {
-    display: inline-block;
-    background: #238636;
-    color: #fff !important;
-    padding: 0.75rem 1.25rem;
+  a { color: #1a73e8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Top bar */
+  .topbar {
+    background: white;
+    border-bottom: 1px solid var(--ixl-border);
+    padding: 0 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--ixl-red);
+    cursor: pointer;
+    user-select: none;
+  }
+  .logo-mark {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--ixl-red), #ff6b6b);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 22px;
+    font-weight: 900;
+    box-shadow: 0 2px 6px rgba(230,57,70,0.3);
+  }
+  .nav { display: flex; gap: 4px; flex: 1; }
+  .nav a {
+    padding: 8px 14px;
     border-radius: 6px;
-    text-decoration: none;
+    color: #555;
     font-weight: 600;
-    margin: 0.5rem 0;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.15s;
   }
-  .btn:hover { background: #2ea043; }
-  ol li { margin: 0.4rem 0; }
-  .muted { color: #8b949e; font-size: 0.9rem; }
+  .nav a:hover { background: var(--ixl-gray); text-decoration: none; }
+  .nav a.active { color: var(--ixl-red); background: #fff0f1; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .score-pill {
+    background: linear-gradient(135deg, var(--ixl-green), var(--ixl-dark-green));
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff9f43, #ee5253);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Layout */
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+  /* Banner */
+  .banner {
+    background: linear-gradient(120deg, #c1272d, #e63946 60%, #ff6b6b);
+    color: white;
+    padding: 36px 32px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    box-shadow: 0 4px 16px rgba(193,39,45,0.2);
+  }
+  .banner h1 { font-size: 28px; margin-bottom: 6px; }
+  .banner p { opacity: 0.95; font-size: 15px; max-width: 560px; }
+  .banner .cta {
+    background: white;
+    color: var(--ixl-red);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .banner .cta:hover { background: #fff0f1; }
+
+  /* Grade tabs */
+  .grades {
+    display: flex;
+    gap: 4px;
+    background: white;
+    padding: 6px;
+    border-radius: 10px;
+    border: 1px solid var(--ixl-border);
+    margin-bottom: 24px;
+    overflow-x: auto;
+  }
+  .grade-tab {
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    color: #555;
+    border: none;
+    background: transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .grade-tab:hover { background: var(--ixl-gray); }
+  .grade-tab.active { background: var(--ixl-red); color: white; }
+
+  /* Skill list */
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 24px 0 12px;
+    color: #222;
+    border-bottom: 2px solid var(--ixl-red);
+    padding-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .badge {
+    background: var(--ixl-red);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .skills {
+    background: white;
+    border: 1px solid var(--ixl-border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .skills-cat {
+    font-weight: 700;
+    color: var(--ixl-red);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 14px 0 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed #eee;
+  }
+  .skills-cat:first-child { margin-top: 0; }
+  .skill-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 14px;
+  }
+  .skill-code {
+    color: #888;
+    font-weight: 700;
+    width: 36px;
+    flex-shrink: 0;
+  }
+  .skill-link {
+    flex: 1;
+    color: #1a73e8;
+    cursor: pointer;
+  }
+  .skill-link:hover { text-decoration: underline; }
+  .skill-medal {
+    color: #999;
+    font-size: 16px;
+    cursor: help;
+  }
+  .skill-medal.earned { color: var(--ixl-yellow); }
+
+  /* Quiz screen */
+  .quiz-wrap {
+    background: white;
+    border: 1px solid var(--ixl-border);
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  .quiz-title {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .quiz-subtitle {
+    color: #666;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  .smartscore {
+    background: linear-gradient(135deg, #fff, #f8f8f8);
+    border: 2px solid var(--ixl-red);
+    border-radius: 10px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 200px;
+  }
+  .ss-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #888;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .ss-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--ixl-red);
+    line-height: 1;
+  }
+  .ss-bar {
+    flex: 1;
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .ss-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--ixl-yellow), var(--ixl-green));
+    transition: width 0.4s ease;
+  }
+
+  .clue-card {
+    background: linear-gradient(135deg, #fef9f0, #fff5e6);
+    border: 2px dashed #f0c674;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .clue-card h3 {
+    font-size: 14px;
+    color: #b8860b;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+  .clue-list { list-style: none; }
+  .clue-list li {
+    padding: 8px 0;
+    font-size: 16px;
+    border-bottom: 1px dotted #e8d4a0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .clue-list li:last-child { border: none; }
+  .clue-list li::before {
+    content: "▸";
+    color: var(--ixl-red);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .clue-list .quote {
+    font-style: italic;
+    color: #555;
+  }
+
+  .options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .option {
+    background: white;
+    border: 2px solid var(--ixl-border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .option:hover { border-color: var(--ixl-blue); background: #f0f8ff; }
+  .option.correct {
+    border-color: var(--ixl-green);
+    background: #e8f6e8;
+    color: #2d6a2d;
+  }
+  .option.wrong {
+    border-color: var(--ixl-red);
+    background: #fde8ea;
+    color: #8a1c22;
+  }
+  .option:disabled { cursor: default; }
+  .option-letter {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--ixl-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 13px;
+    color: #555;
+    flex-shrink: 0;
+  }
+  .option.correct .option-letter { background: var(--ixl-green); color: white; }
+  .option.wrong .option-letter { background: var(--ixl-red); color: white; }
+
+  .portrait {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-size: cover;
+    background-position: center;
+  }
+  .portrait.lg { width: 140px; height: 140px; border-radius: 12px; }
+  .portrait.sm { width: 36px; height: 36px; border-radius: 6px; }
+  .clue-portrait {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed #e8d4a0;
+  }
+  .clue-portrait.silhouette .portrait { filter: brightness(0) saturate(100%); }
+  .clue-portrait .meta {
+    flex: 1;
+    font-size: 13px;
+    color: #555;
+  }
+  .clue-portrait .meta strong { color: #333; }
+
+  .feedback {
+    margin-top: 20px;
+    padding: 16px 20px;
+    border-radius: 10px;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.right {
+    background: #e8f6e8;
+    border-left: 4px solid var(--ixl-green);
+    color: #2d6a2d;
+  }
+  .feedback.wrong {
+    background: #fde8ea;
+    border-left: 4px solid var(--ixl-red);
+    color: #8a1c22;
+  }
+  .feedback h4 { margin-bottom: 6px; font-size: 16px; }
+  .feedback p { font-size: 14px; }
+  .feedback button {
+    margin-top: 12px;
+    background: var(--ixl-green);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .feedback button:hover { background: var(--ixl-dark-green); }
+  .feedback.wrong button { background: var(--ixl-red); }
+  .feedback.wrong button:hover { background: var(--ixl-dark-red); }
+
+  /* Awards page */
+  .awards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+  }
+  .award {
+    background: white;
+    border: 1px solid var(--ixl-border);
+    border-radius: 12px;
+    padding: 20px 12px;
+    text-align: center;
+    transition: transform 0.15s;
+  }
+  .award.locked { opacity: 0.4; filter: grayscale(0.8); }
+  .award:hover { transform: translateY(-2px); }
+  .award-icon {
+    font-size: 40px;
+    margin-bottom: 8px;
+  }
+  .award-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: #333;
+  }
+  .award-desc {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 32px 16px;
+    color: #999;
+    font-size: 12px;
+    border-top: 1px solid var(--ixl-border);
+    margin-top: 48px;
+    background: white;
+  }
+  footer .links { margin-bottom: 8px; }
+  footer .links a { margin: 0 8px; color: #777; }
+
+  /* Hidden helper */
+  .hidden { display: none !important; }
+
+  @media (max-width: 700px) {
+    .nav a { display: none; }
+    .nav a.always { display: inline-block; }
+    .options { grid-template-columns: 1fr; }
+    .banner h1 { font-size: 22px; }
+    .quiz-header { flex-direction: column; }
+    .smartscore { width: 100%; }
+  }
+
+  /* Modal */
+  .modal-bg {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 12px;
+    padding: 28px;
+    max-width: 440px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+  .modal h2 { font-size: 24px; color: var(--ixl-red); margin-bottom: 8px; }
+  .modal .trophy { font-size: 64px; margin-bottom: 12px; }
+  .modal p { color: #555; margin-bottom: 16px; }
+  .modal button {
+    background: var(--ixl-red);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 15px;
+  }
 </style>
 </head>
 <body>
-  <h1>Rammerhead — one-click deploy</h1>
-  <p>This repo is configured to deploy <a href="https://github.com/binary-person/rammerhead" target="_blank" rel="noopener">Rammerhead</a> as a Docker service on Render's free tier. GitHub Pages can't run Node, so the actual proxy lives on Render; this page is just the launcher.</p>
 
-  <h2>Deploy</h2>
-  <p><a class="btn" href="https://render.com/deploy?repo=https://github.com/karimdaman/ramming" target="_blank" rel="noopener">Deploy to Render</a></p>
-  <ol>
-    <li>Click the button. Sign in to Render (free, GitHub login works).</li>
-    <li>Render reads <code>render.yaml</code> and builds the <code>Dockerfile</code>. First build takes ~3-5 minutes.</li>
-    <li>You'll get a URL like <code>https://rammerhead-xxxx.onrender.com</code>. That URL <em>is</em> your Rammerhead instance.</li>
-  </ol>
+<div class="topbar">
+  <div class="logo" onclick="showPage('home')">
+    <div class="logo-mark">Z</div>
+    <span>ZXL</span>
+  </div>
+  <nav class="nav">
+    <a href="#" data-page="home" class="active always">Learning</a>
+    <a href="#" data-page="diagnostic">Diagnostic</a>
+    <a href="#" data-page="awards">Awards</a>
+    <a href="#" data-page="analytics">Analytics</a>
+    <a href="#" data-page="recommendations">Recommendations</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="score-pill">⭐ <span id="totalScore">0</span> pts</div>
+    <div class="avatar" title="Proxy Account">PR</div>
+  </div>
+</div>
 
-  <h2>Heads-up about the free tier</h2>
-  <ul>
-    <li>Render's free web services <strong>spin down after 15 minutes of inactivity</strong>. The first request after that takes ~30s to wake. For an always-on instance use Fly.io, Koyeb, or a cheap VPS.</li>
-    <li>Some hosts may flag/suspend public proxies under their AUP — Render hasn't been aggressive about it but it's not guaranteed.</li>
-  </ul>
+<div class="container">
 
-  <h2>Files in this repo</h2>
-  <ul>
-    <li><code>Dockerfile</code> — clones Rammerhead, installs deps, runs it.</li>
-    <li><code>start.sh</code> — patches <code>config.js</code> to bind <code>0.0.0.0</code> on the platform-provided <code>$PORT</code>.</li>
-    <li><code>render.yaml</code> — Render blueprint for one-click deploy.</li>
-    <li><code>index.html</code> — this page.</li>
-  </ul>
+<!-- HOME PAGE -->
+<div id="page-home">
+  <div class="banner">
+    <div>
+      <h1>Zenless Zone Zero Character Recognition</h1>
+      <p>Sharpen your Hollow-investigation skills! Answer skill-based questions about New Eridu's most notable agents — from Cunning Hares to the Section 6 elites. Earn medals, climb your SmartScore, and become a certified Proxy.</p>
+    </div>
+    <button class="cta" onclick="startRandom()">Start a random skill →</button>
+  </div>
 
-  <h2>Other hosts</h2>
-  <p>The same <code>Dockerfile</code> works on Fly.io (<code>fly launch</code>), Koyeb, Railway, or any host that runs Docker images. Just point them at this repo.</p>
+  <div class="grades" id="gradeTabs">
+    <button class="grade-tab active" data-grade="all">All Factions</button>
+    <button class="grade-tab" data-grade="cunning">Cunning Hares</button>
+    <button class="grade-tab" data-grade="belobog">Belobog HI</button>
+    <button class="grade-tab" data-grade="victoria">Victoria Housekeeping</button>
+    <button class="grade-tab" data-grade="calydon">Sons of Calydon</button>
+    <button class="grade-tab" data-grade="cid">Criminal Investigation</button>
+    <button class="grade-tab" data-grade="sec6">Section 6</button>
+    <button class="grade-tab" data-grade="lyra">Stars of Lyra</button>
+    <button class="grade-tab" data-grade="mockingbird">Mockingbird</button>
+    <button class="grade-tab" data-grade="spook">Spook Shack</button>
+    <button class="grade-tab" data-grade="hollows">Hollow Stalkers</button>
+  </div>
+
+  <div class="section-title">
+    Skills <span class="badge" id="skillCount">35</span>
+  </div>
+  <div class="skills" id="skillsList"></div>
+</div>
+
+<!-- QUIZ PAGE -->
+<div id="page-quiz" class="hidden">
+  <div class="quiz-wrap">
+    <div class="quiz-header">
+      <div>
+        <div class="quiz-title" id="qTitle">Skill A.1 — Identify the agent</div>
+        <div class="quiz-subtitle" id="qSubtitle">Read the clues carefully and choose the correct character.</div>
+      </div>
+      <div class="smartscore">
+        <div>
+          <div class="ss-label">SmartScore</div>
+          <div class="ss-value" id="ssValue">0</div>
+        </div>
+        <div class="ss-bar"><div class="ss-fill" id="ssFill" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="clue-card">
+      <h3>📋 Investigation Notes</h3>
+      <ul class="clue-list" id="clueList"></ul>
+    </div>
+
+    <div class="options" id="options"></div>
+
+    <div class="feedback" id="feedback">
+      <h4 id="fbTitle"></h4>
+      <p id="fbBody"></p>
+      <button onclick="nextQuestion()">Next question →</button>
+    </div>
+
+    <div style="margin-top:18px; display:flex; justify-content:space-between; align-items:center; font-size:13px; color:#888;">
+      <a href="#" onclick="showPage('home');return false;">← Back to skills</a>
+      <span>Question <span id="qNum">1</span> of this skill</span>
+    </div>
+  </div>
+</div>
+
+<!-- AWARDS PAGE -->
+<div id="page-awards" class="hidden">
+  <div class="banner" style="background: linear-gradient(120deg,#ffc107,#ff9800);">
+    <div>
+      <h1>🏆 Your Awards</h1>
+      <p>Every milestone you cross unlocks a medal. Keep grinding through the skills to fill the trophy case.</p>
+    </div>
+  </div>
+  <div class="section-title">Medals & Trophies</div>
+  <div class="awards-grid" id="awardsGrid"></div>
+</div>
+
+<!-- ANALYTICS PAGE -->
+<div id="page-analytics" class="hidden">
+  <div class="banner" style="background: linear-gradient(120deg,#4ba1f1,#1a73e8);">
+    <div>
+      <h1>📊 Analytics</h1>
+      <p>Time spent, skills attempted, accuracy. The kind of dashboard a Proxy supervisor would absolutely send you a passive-aggressive memo about.</p>
+    </div>
+  </div>
+  <div class="section-title">This Session</div>
+  <div class="skills">
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:16px;">
+      <div style="padding:16px; background:#f9f9f9; border-radius:8px;">
+        <div style="font-size:12px; color:#888; text-transform:uppercase;">Questions Answered</div>
+        <div style="font-size:32px; font-weight:900; color:var(--ixl-red);" id="aQA">0</div>
+      </div>
+      <div style="padding:16px; background:#f9f9f9; border-radius:8px;">
+        <div style="font-size:12px; color:#888; text-transform:uppercase;">Correct</div>
+        <div style="font-size:32px; font-weight:900; color:var(--ixl-green);" id="aCorrect">0</div>
+      </div>
+      <div style="padding:16px; background:#f9f9f9; border-radius:8px;">
+        <div style="font-size:12px; color:#888; text-transform:uppercase;">Accuracy</div>
+        <div style="font-size:32px; font-weight:900; color:var(--ixl-blue);" id="aAcc">—</div>
+      </div>
+      <div style="padding:16px; background:#f9f9f9; border-radius:8px;">
+        <div style="font-size:12px; color:#888; text-transform:uppercase;">Skills Mastered</div>
+        <div style="font-size:32px; font-weight:900; color:#ff9800;" id="aMastered">0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIAGNOSTIC PAGE -->
+<div id="page-diagnostic" class="hidden">
+  <div class="banner" style="background: linear-gradient(120deg,#5cb85c,#2e7d32);">
+    <div>
+      <h1>🧠 Diagnostic Snapshot</h1>
+      <p>Take an adaptive 10-question evaluation across all factions. ZXL recommends skills based on your weak spots.</p>
+    </div>
+    <button class="cta" onclick="startDiagnostic()">Begin Diagnostic →</button>
+  </div>
+  <div class="section-title">How it works</div>
+  <div class="skills">
+    <p style="padding:8px 0;">The Diagnostic adapts as you answer. Get a question right and the next one gets harder; miss one and ZXL pulls you back to a more comfortable difficulty. After 10 questions you'll get a faction-by-faction proficiency map.</p>
+    <p style="padding:8px 0; color:#888; font-size:13px;">Note: this is, in fact, just 10 random skill questions strung together. We are not Pearson.</p>
+  </div>
+</div>
+
+<!-- RECOMMENDATIONS PAGE -->
+<div id="page-recommendations" class="hidden">
+  <div class="banner" style="background: linear-gradient(120deg,#9c27b0,#673ab7);">
+    <div>
+      <h1>✨ Recommended Skills</h1>
+      <p>Based on absolutely no real machine learning whatsoever, here are some skills you should probably try.</p>
+    </div>
+  </div>
+  <div class="section-title">For You</div>
+  <div class="skills" id="recList"></div>
+</div>
+
+</div>
+
+<footer>
+  <div class="links">
+    <a href="#">About ZXL</a>
+    <a href="#">Help Center</a>
+    <a href="#">Membership</a>
+    <a href="#">Terms (definitely fake)</a>
+    <a href="#">Privacy</a>
+  </div>
+  <div>© 2026 ZXL Learning, a totally-not-IXL parody. Zenless Zone Zero © HoYoverse. Fan project, not affiliated.</div>
+</footer>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="trophy" id="modalIcon">🏆</div>
+    <h2 id="modalTitle">Skill Mastered!</h2>
+    <p id="modalBody">You hit a SmartScore of 100. Onward, Proxy.</p>
+    <button onclick="closeModal()">Continue</button>
+  </div>
+</div>
+
+<script>
+// -------- ZZZ Character database --------
+const CHARACTERS = [
+  // Cunning Hares
+  { name:"Anby Demara", faction:"cunning", attribute:"Electric", spec:"Stun", weapon:"Greatsword (cathode-ray katana)", clues:[
+    "A pink-haired girl from the Cunning Hares with absolutely zero common sense from watching too much TV.",
+    "Her catchphrase explanations all start with 'According to the show I watched...'",
+    "Wields a 'Cathode Saber' that hums like a CRT and stuns enemies with anomaly buildup."
+  ]},
+  { name:"Nicole Demara", faction:"cunning", attribute:"Ether", spec:"Support", weapon:"Energy Cannon (briefcase)", clues:[
+    "Self-proclaimed boss of the Cunning Hares — actually mostly broke and dodging debt collectors.",
+    "Carries an enormous suitcase that doubles as an ether cannon.",
+    "Is pretty sure 'business expenses' covers everything."
+  ]},
+  { name:"Billy Kid", faction:"cunning", attribute:"Physical", spec:"Attack", weapon:"Twin pistols", clues:[
+    "An android cowboy obsessed with becoming a hero of justice.",
+    "Wields twin revolvers and can bullet-time across rooftops.",
+    "Refers to his squadmates as 'partner' and means it sincerely."
+  ]},
+  { name:"Nekomata", faction:"cunning", attribute:"Physical", spec:"Attack", weapon:"Dual blades (claws)", clues:[
+    "A purple-haired Thiren with cat ears and a tail; basically a goblin in human form.",
+    "Loves teasing Anby and calling Nicole 'Boss' just to mock her.",
+    "Fights with razor-edged dual swords and impossible agility."
+  ]},
+  { name:"Soldier 11", faction:"cunning", attribute:"Fire", spec:"Attack", weapon:"Burning longsword", clues:[
+    "An ex-Obol Squad soldier who joined the Cunning Hares strictly out of professionalism.",
+    "Treats every grocery run like a black-ops mission.",
+    "Her sword ignites mid-swing with continuous fire damage."
+  ]},
+  { name:"Corin Wickes", faction:"victoria", attribute:"Physical", spec:"Attack", weapon:"Chainsaw", clues:[
+    "An impossibly shy Victoria Housekeeping maid who apologizes for breathing.",
+    "Carries a comically oversized chainsaw she calls 'Mr. Cuddles'.",
+    "Wears glasses and a frilly apron while dismembering ethereals."
+  ]},
+
+  // Belobog Heavy Industries
+  { name:"Anton Ivanov", faction:"belobog", attribute:"Electric", spec:"Attack", weapon:"Drill", clues:[
+    "A loud Belobog construction worker who calls everyone 'comrade'.",
+    "His drill literally pierces the heavens — and concrete, mostly concrete.",
+    "Believes any problem can be solved with more horsepower."
+  ]},
+  { name:"Ben Bigger", faction:"belobog", attribute:"Fire", spec:"Defense", weapon:"Fists / brass knuckles", clues:[
+    "A massive bear Thiren in a business suit; CFO energy with a punchable grin.",
+    "Stands behind allies, eats hits, then counter-punches with explosive fists.",
+    "Tea time is mandatory. Everyone gets tea."
+  ]},
+  { name:"Koleda Belobog", faction:"belobog", attribute:"Fire", spec:"Stun", weapon:"Hammer", clues:[
+    "Heir to Belobog Heavy Industries; tiny stature, gigantic ego.",
+    "Swings a hammer the size of her body and lights it on fire.",
+    "Refuses to admit she's scared of ghosts."
+  ]},
+  { name:"Grace Howard", faction:"belobog", attribute:"Electric", spec:"Anomaly", weapon:"Electric minigun", clues:[
+    "Belobog's chief engineer; sleep schedule is purely theoretical.",
+    "Can build a railgun out of a vending machine in twenty minutes.",
+    "Wears goggles and a one-piece coverall and brings a minigun to the office."
+  ]},
+  { name:"Lucy Montesanto", faction:"calydon", attribute:"Fire", spec:"Support", weapon:"Spear (commands hogs)", clues:[
+    "Princess of the Sons of Calydon biker gang; tsundere nepo baby.",
+    "Doesn't fight directly — instead commands a trio of armored fire-piglets.",
+    "Twirls a parasol-spear and is allergic to humility."
+  ]},
+  { name:"Piper Wheel", faction:"calydon", attribute:"Physical", spec:"Anomaly", weapon:"Truck (Sweetie)", clues:[
+    "A Calydon trucker who drives a giant rig she calls 'Sweetie'.",
+    "Spins her vehicle like a top to mow down enemies in a wide AoE.",
+    "Cheerful, food-obsessed, and just turned 18, actually."
+  ]},
+  { name:"Caesar King", faction:"calydon", attribute:"Physical", spec:"Defense", weapon:"Greatsword & shield", clues:[
+    "Boss of the Sons of Calydon; queen of bikers, mom-friend energy turned to eleven.",
+    "Carries a giant shield and matching sword and takes hits FOR her crew.",
+    "Towering, scarred, and absolutely the person you call when things go wrong."
+  ]},
+  { name:"Burnice White", faction:"calydon", attribute:"Fire", spec:"Anomaly", weapon:"Flamethrowers", clues:[
+    "Calydon arsonist with a permanent grin and dual flamethrowers.",
+    "Drinks from a hip flask between throwing molotovs.",
+    "Genuinely thinks fire is the most expressive form of art."
+  ]},
+  { name:"Lighter Ren", faction:"calydon", attribute:"Fire", spec:"Stun", weapon:"Bat (Tiger Cannon)", clues:[
+    "Former boxer-turned-coach for the Sons of Calydon's youth program.",
+    "Fights with a cannon-shaped bat that ignites on a perfect swing.",
+    "Big-brother type with a soft spot for hopeless underdogs."
+  ]},
+
+  // Criminal Investigation
+  { name:"Zhu Yuan", faction:"cid", attribute:"Ether", spec:"Attack", weapon:"Pistols", clues:[
+    "Public Security Section 6 captain. Total professional with a chocolate addiction.",
+    "Dual-wields ether-charged service pistols.",
+    "Inherited her great responsibilities and her great corgi family."
+  ]},
+  { name:"Qingyi", faction:"cid", attribute:"Electric", spec:"Stun", weapon:"Polearm (gauntlets)", clues:[
+    "A Public Security android with a stoic deadpan and a Kabuki mask.",
+    "Strikes with electric-charged tonfa-like gauntlet weapons.",
+    "Built by Hoshimi Industries; a one-of-a-kind frame."
+  ]},
+  { name:"Jane Doe", faction:"cid", attribute:"Physical", spec:"Anomaly", weapon:"Rapier", clues:[
+    "A rat Thiren undercover agent who lies even when telling the truth.",
+    "Pink hair, fox-like grin, fences with a slim rapier.",
+    "Her actual identity is — well, that's the joke, isn't it?"
+  ]},
+  { name:"Seth Lowell", faction:"cid", attribute:"Electric", spec:"Defense", weapon:"Shield-shaft", clues:[
+    "Public Security rookie with a giant shield and golden retriever vibes.",
+    "A boar Thiren who wants to protect everyone, especially Jane Doe.",
+    "Electric defense specialist; takes hits and zaps in return."
+  ]},
+
+  // Section 6
+  { name:"Soukaku", faction:"sec6", attribute:"Ice", spec:"Support", weapon:"Greatsword", clues:[
+    "Tiny demon-horned blue-haired Section 6 trainee; hungry 24/7.",
+    "Will absolutely commit war crimes for a snack.",
+    "Wields a greatsword nearly twice her size and freezes enemies for her team."
+  ]},
+  { name:"Ellen Joe", faction:"sec6", attribute:"Ice", spec:"Attack", weapon:"Scythe (shark tail)", clues:[
+    "A shark Thiren maid from Section 6 who wants nothing more than a nap.",
+    "Half-asleep is a competitive advantage, apparently.",
+    "Her tail-blade carves through enemies with ice anomaly procs."
+  ]},
+  { name:"Lycaon", faction:"sec6", attribute:"Ice", spec:"Stun", weapon:"Gauntlets / fists", clues:[
+    "A wolf Thiren butler with grey hair and impeccable manners.",
+    "Punches with the force of an ice-elemental freight train.",
+    "Refers to his master with absolute professional decorum."
+  ]},
+  { name:"Astra Yao", faction:"sec6", attribute:"Ether", spec:"Support", weapon:"Microphone-staff", clues:[
+    "Idol singer and Section 6 affiliate; rabbit Thiren energy turned to performance.",
+    "Buffs allies with concert-tier crit damage from her songs.",
+    "A literal living trend; her merch sells out in hours."
+  ]},
+  { name:"Evelyn Chevalier", faction:"sec6", attribute:"Fire", spec:"Attack", weapon:"Whip-chain", clues:[
+    "Section 6 Mountain Operations leader. Cool, scarred, and mature.",
+    "Whip-chain user with razor-tipped fire damage at range.",
+    "Missing one eye; has one of the best track records in field ops."
+  ]},
+
+  // Stars of Lyra
+  { name:"Yanagi", faction:"lyra", attribute:"Electric", spec:"Anomaly", weapon:"Katana(s)", clues:[
+    "Ex-Mountain-Operations swordswoman now with the Stars of Lyra.",
+    "Stoic, polite, and absolutely terrifying in close quarters.",
+    "Carries dual electric katanas; her stance is the warning."
+  ]},
+  { name:"Miyabi Hoshimi", faction:"lyra", attribute:"Ice", spec:"Anomaly", weapon:"Katana", clues:[
+    "Section 6 captain on loan to the Stars of Lyra; the prodigy of the Hoshimi clan.",
+    "Frost-element kenjutsu; one strike, one dead Hollow.",
+    "Has antlers and a permanently disappointed expression."
+  ]},
+  { name:"Harumasa Aoi", faction:"lyra", attribute:"Electric", spec:"Attack", weapon:"Bow", clues:[
+    "Section 6 archer who goes by 'Haru' to almost no one.",
+    "Plucks arrows out of thin air and zaps with electric anomaly.",
+    "Permanently underslept; has 'main character' bangs."
+  ]},
+  { name:"Trigger", faction:"lyra", attribute:"Electric", spec:"Stun", weapon:"Sniper rifle", clues:[
+    "Stoic Obol Squad sniper turned Stars of Lyra operative.",
+    "Long-range electric stuns; barely speaks, twin braids.",
+    "Has the same drill-sergeant voice as Soldier 11. Suspicious."
+  ]},
+
+  // Mockingbird
+  { name:"Hugo Vlad", faction:"mockingbird", attribute:"Frost", spec:"Attack", weapon:"Rapier / firearm", clues:[
+    "Aristocratic vampire-coded Mockingbird operative.",
+    "Frost element; carries a rapier and a flintlock-style sidearm.",
+    "Speaks in measured sentences and thinks of New Eridu as a chessboard."
+  ]},
+  { name:"Vivian Banshee", faction:"mockingbird", attribute:"Ether", spec:"Anomaly", weapon:"Spell focus / claws", clues:[
+    "Mockingbird's bird-Thiren songstress.",
+    "Ether-anomaly caster; voice itself is a weapon.",
+    "Beautiful, eerie, and absolutely manipulative when she wants to be."
+  ]},
+
+  // Spook Shack
+  { name:"Pulchra Fellini", faction:"spook", attribute:"Physical", spec:"Stun", weapon:"Greatsword", clues:[
+    "A blue-haired Spook Shack cleaner who looks tired in every cutscene.",
+    "Wields a slab of a sword and stuns with sheer kinetic force.",
+    "Takes orders, takes naps, takes no prisoners."
+  ]},
+  { name:"Ju Fufu", faction:"spook", attribute:"Fire", spec:"Anomaly", weapon:"Lion-dance head", clues:[
+    "Twin from House Wang; performs lion-dance combat with her sister.",
+    "Wears a flame-painted lion mask and dances enemies to ash.",
+    "Cheerful, festival energy, never travels alone."
+  ]},
+  { name:"Yuzuha Hibiscus", faction:"spook", attribute:"Ice", spec:"Support", weapon:"Tea-set focus", clues:[
+    "A poised tea-master support agent of the Spook Shack.",
+    "Pours ice-elemental buffs over her allies — literally, the tea is the buff.",
+    "Wears a kimono and matching disapproval."
+  ]},
+
+  // Hollow Stalkers / Specters
+  { name:"Yixuan", faction:"hollows", attribute:"Auric Ink", spec:"Attack", weapon:"Calligraphy brush", clues:[
+    "Carries a long calligraphy brush and inks reality itself.",
+    "Auric-Ink discipline practitioner; debuted with a brand-new attribute.",
+    "Speaks like an oracle and doodles like a prodigy."
+  ]},
+  { name:"Pan Yinhu", faction:"hollows", attribute:"Auric Ink", spec:"Defense", weapon:"Painted gourd / staff", clues:[
+    "Burly Yunkui Summit elder; auric-ink defender.",
+    "Tanks for the team and laughs through every hit.",
+    "His gourd holds something — wine? ink? both? — and he'll never tell."
+  ]},
+  { name:"Magus", faction:"hollows", attribute:"Ether", spec:"Anomaly", weapon:"Conjured constructs", clues:[
+    "A masked figure who appears in Hollows that shouldn't exist yet.",
+    "Conjures geometric ether constructs; voice synthesized.",
+    "Identity disputed — many believe Magus is more than one person."
+  ]}
+];
+
+// -------- Portrait generator (stylized SVG, no copyrighted art) --------
+const ATTR_COLORS = {
+  "Electric":  ["#fff269", "#ffae00"],
+  "Fire":      ["#ff8a4f", "#c1272d"],
+  "Ice":       ["#a8eaff", "#2196f3"],
+  "Physical":  ["#f0f0f0", "#9e9e9e"],
+  "Ether":     ["#e6a8ff", "#7b1fa2"],
+  "Frost":     ["#cfe9ff", "#3f51b5"],
+  "Auric Ink": ["#ffe6a8", "#b8860b"]
+};
+const ATTR_GLYPH = {
+  "Electric":"⚡","Fire":"🔥","Ice":"❄","Physical":"✊","Ether":"✦","Frost":"❅","Auric Ink":"墨"
+};
+const FACTION_CREST = {
+  cunning:"🐰", belobog:"🔨", victoria:"🧹", calydon:"🏍", cid:"🛡",
+  sec6:"⑥", lyra:"⭐", mockingbird:"🐦", spook:"👻", hollows:"⚫"
+};
+
+function initials(name) {
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+}
+
+function portraitSVG(char) {
+  const [c1, c2] = ATTR_COLORS[char.attribute] || ["#ddd","#888"];
+  const ini = initials(char.name);
+  const glyph = ATTR_GLYPH[char.attribute] || "";
+  const crest = FACTION_CREST[char.faction] || "";
+  const seed = char.name.charCodeAt(0) + char.name.charCodeAt(1 % char.name.length);
+  const angle = (seed % 90) - 45;
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+    <defs>
+      <linearGradient id='g${seed}' x1='0' y1='0' x2='1' y2='1'>
+        <stop offset='0%' stop-color='${c1}'/>
+        <stop offset='100%' stop-color='${c2}'/>
+      </linearGradient>
+      <radialGradient id='r${seed}' cx='30%' cy='30%' r='70%'>
+        <stop offset='0%' stop-color='rgba(255,255,255,0.5)'/>
+        <stop offset='100%' stop-color='rgba(255,255,255,0)'/>
+      </radialGradient>
+    </defs>
+    <rect width='200' height='200' fill='url(#g${seed})'/>
+    <circle cx='100' cy='100' r='160' fill='url(#r${seed})'/>
+    <g transform='rotate(${angle} 100 100)' opacity='0.18'>
+      <rect x='-40' y='80' width='280' height='40' fill='white'/>
+    </g>
+    <text x='100' y='120' font-family='Arial Black, sans-serif' font-size='86' font-weight='900'
+          fill='white' text-anchor='middle' stroke='rgba(0,0,0,0.25)' stroke-width='2'>${ini}</text>
+    <text x='22' y='40' font-size='28' fill='white' opacity='0.9'>${glyph}</text>
+    <text x='178' y='40' font-size='24' fill='white' opacity='0.9' text-anchor='end'>${crest}</text>
+    <text x='100' y='180' font-family='Arial' font-size='14' fill='white' opacity='0.85'
+          text-anchor='middle' font-weight='700' letter-spacing='1'>${char.attribute.toUpperCase()}</text>
+  </svg>`;
+  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+}
+
+function portraitDiv(char, cls="") {
+  return `<div class="portrait ${cls}" style="background-image:url('${portraitSVG(char)}')" role="img" aria-label="${char.name} portrait"></div>`;
+}
+
+// -------- Skills (one per character clustered into categories) --------
+const FACTIONS = {
+  all: "All Factions",
+  cunning: "Cunning Hares — Section A",
+  belobog: "Belobog Heavy Industries — Section B",
+  victoria: "Victoria Housekeeping Co. — Section V",
+  calydon: "Sons of Calydon — Section S",
+  cid: "Public Security Criminal Investigation — Section P",
+  sec6: "Section 6 Special Response — Section 6",
+  lyra: "Stars of Lyra — Section L",
+  mockingbird: "Mockingbird — Section M",
+  spook: "Spook Shack — Section X",
+  hollows: "Hollow Stalkers — Section H"
+};
+const FACTION_PREFIXES = { cunning:"A", belobog:"B", victoria:"V", calydon:"S", cid:"P", sec6:"6", lyra:"L", mockingbird:"M", spook:"X", hollows:"H" };
+
+const SKILL_CATS = [
+  { id:"identify", label:"Identify the Agent" },
+  { id:"attribute", label:"Match the Attribute" },
+  { id:"weapon",    label:"Choose the Weapon" },
+  { id:"faction",   label:"Faction Recognition" },
+  { id:"quote",     label:"Who said it?" }
+];
+
+// -------- State --------
+let state = {
+  page: "home",
+  currentSkill: null,
+  ss: 0,
+  qNum: 1,
+  qCount: 0,
+  correct: 0,
+  totalScore: parseInt(localStorage.getItem("zxl_score") || "0", 10),
+  mastered: JSON.parse(localStorage.getItem("zxl_mastered") || "[]"),
+  awards: JSON.parse(localStorage.getItem("zxl_awards") || "[]"),
+  currentChar: null,
+  currentMode: null,
+  pendingFaction: "all"
+};
+
+// -------- Page nav --------
+function showPage(p) {
+  state.page = p;
+  ["home","quiz","awards","analytics","diagnostic","recommendations"].forEach(x => {
+    document.getElementById("page-" + x).classList.toggle("hidden", x !== p);
+  });
+  document.querySelectorAll(".nav a").forEach(a => {
+    a.classList.toggle("active", a.dataset.page === p || (p === "quiz" && a.dataset.page === "home"));
+  });
+  if (p === "awards") renderAwards();
+  if (p === "analytics") renderAnalytics();
+  if (p === "recommendations") renderRecommendations();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".nav a").forEach(a => {
+  a.addEventListener("click", e => { e.preventDefault(); showPage(a.dataset.page); });
+});
+
+// -------- Skill list --------
+function renderSkills(grade="all") {
+  const list = document.getElementById("skillsList");
+  list.innerHTML = "";
+  let chars = grade === "all" ? CHARACTERS : CHARACTERS.filter(c => c.faction === grade);
+  if (!chars.length) {
+    list.innerHTML = '<p style="padding:20px; color:#888;">No characters yet for this faction.</p>';
+    document.getElementById("skillCount").textContent = 0;
+    return;
+  }
+  // Group by faction
+  const byFaction = {};
+  chars.forEach(c => { (byFaction[c.faction] = byFaction[c.faction] || []).push(c); });
+  let total = 0;
+  Object.keys(byFaction).forEach(f => {
+    const head = document.createElement("div");
+    head.className = "skills-cat";
+    head.textContent = FACTIONS[f] || f;
+    list.appendChild(head);
+    byFaction[f].forEach((c, i) => {
+      total++;
+      SKILL_CATS.forEach((cat, ci) => {
+        // Only show 2 of 5 categories per character to keep list reasonable
+        if (ci > 1 && Math.random() > 1) return; // disable random; show all
+      });
+      // For each character, generate one skill per category
+      SKILL_CATS.forEach((cat, ci) => {
+        const code = `${FACTION_PREFIXES[f] || "Z"}${chars.indexOf(c)+1}.${ci+1}`;
+        const id = `${f}|${c.name}|${cat.id}`;
+        const row = document.createElement("div");
+        row.className = "skill-row";
+        const mastered = state.mastered.includes(id);
+        row.innerHTML = `
+          <span class="skill-code">${code}</span>
+          ${portraitDiv(c, "sm")}
+          <span class="skill-link">${cat.label}: ${c.name.split(" ")[0]}</span>
+          <span class="skill-medal ${mastered ? "earned" : ""}" title="${mastered?"Mastered":"Not yet mastered"}">${mastered ? "🏅" : "⚪"}</span>
+        `;
+        row.querySelector(".skill-link").addEventListener("click", () => startSkill(c, cat.id, code));
+        list.appendChild(row);
+      });
+    });
+  });
+  document.getElementById("skillCount").textContent = total * SKILL_CATS.length;
+}
+
+document.querySelectorAll(".grade-tab").forEach(t => {
+  t.addEventListener("click", () => {
+    document.querySelectorAll(".grade-tab").forEach(x => x.classList.remove("active"));
+    t.classList.add("active");
+    state.pendingFaction = t.dataset.grade;
+    renderSkills(t.dataset.grade);
+  });
+});
+
+// -------- Quiz --------
+function startSkill(char, mode, code) {
+  state.currentChar = char;
+  state.currentMode = mode;
+  state.currentSkill = code + "|" + mode + "|" + char.name;
+  state.ss = 0;
+  state.qNum = 1;
+  document.getElementById("qTitle").textContent = `Skill ${code} — ${SKILL_CATS.find(c=>c.id===mode).label}`;
+  document.getElementById("qSubtitle").textContent = "Earn a SmartScore of 100 to master this skill.";
+  showPage("quiz");
+  loadQuestion();
+}
+
+function startRandom() {
+  const c = CHARACTERS[Math.floor(Math.random()*CHARACTERS.length)];
+  const cat = SKILL_CATS[Math.floor(Math.random()*SKILL_CATS.length)];
+  startSkill(c, cat.id, "??.?");
+}
+
+function loadQuestion() {
+  const c = state.currentChar;
+  const mode = state.currentMode;
+  const optsEl = document.getElementById("options");
+  const clueEl = document.getElementById("clueList");
+  const fb = document.getElementById("feedback");
+  fb.classList.remove("show","right","wrong");
+  optsEl.innerHTML = "";
+  clueEl.innerHTML = "";
+  document.querySelectorAll(".clue-card .clue-portrait").forEach(n => n.remove());
+  document.getElementById("qNum").textContent = state.qNum;
+
+  // Build clues + options based on mode
+  let clueText = [];
+  let correctText = "";
+  let options = [];
+  let showPortraitInClue = false;
+  let silhouette = false;
+
+  if (mode === "identify") {
+    clueText = c.clues.slice();
+    correctText = c.name;
+    options = pickOptions(CHARACTERS.map(x => x.name), c.name);
+    showPortraitInClue = true;
+    silhouette = true;
+  } else if (mode === "attribute") {
+    clueText = [
+      `This character is known as ${c.name}.`,
+      `Faction: ${FACTIONS[c.faction]}.`,
+      `Specialty: ${c.spec}.`
+    ];
+    correctText = c.attribute;
+    const all = ["Electric","Fire","Ice","Physical","Ether","Frost","Auric Ink"];
+    options = pickOptions(all, c.attribute);
+    showPortraitInClue = true;
+  } else if (mode === "weapon") {
+    clueText = [
+      `Character: ${c.name}.`,
+      `Attribute: ${c.attribute}, Specialty: ${c.spec}.`,
+      c.clues[Math.floor(Math.random()*c.clues.length)]
+    ];
+    correctText = c.weapon;
+    options = pickOptions(CHARACTERS.map(x=>x.weapon).filter((v,i,a)=>a.indexOf(v)===i), c.weapon);
+    showPortraitInClue = true;
+  } else if (mode === "faction") {
+    clueText = c.clues.slice();
+    correctText = FACTIONS[c.faction];
+    options = pickOptions(Object.values(FACTIONS).filter(v => v !== "All Factions"), FACTIONS[c.faction]);
+    showPortraitInClue = true;
+    silhouette = true;
+  } else if (mode === "quote") {
+    const quote = makeQuote(c);
+    clueText = [
+      `Field-recorder transcript:`,
+      `"${quote}"`,
+      `Attribute hint: ${c.attribute}.`
+    ];
+    correctText = c.name;
+    options = pickOptions(CHARACTERS.map(x => x.name), c.name);
+  }
+
+  if (showPortraitInClue) {
+    const meta = silhouette
+      ? `<strong>Unknown agent</strong><br>Silhouette analysis only. Reveal pending answer.`
+      : `<strong>${c.name}</strong><br>${FACTIONS[c.faction]} · ${c.attribute} · ${c.spec}`;
+    const wrap = document.createElement("div");
+    wrap.className = "clue-portrait" + (silhouette ? " silhouette" : "");
+    wrap.innerHTML = `${portraitDiv(c,"lg")}<div class="meta">${meta}</div>`;
+    clueEl.parentElement.insertBefore(wrap, clueEl);
+  }
+
+  clueText.forEach(t => {
+    const li = document.createElement("li");
+    if (t.startsWith('"')) li.classList.add("quote");
+    li.appendChild(document.createTextNode(t));
+    clueEl.appendChild(li);
+  });
+
+  const letters = ["A","B","C","D"];
+  options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    const charForOpt = CHARACTERS.find(x => x.name === opt);
+    const portrait = charForOpt ? portraitDiv(charForOpt) : "";
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span>${portrait}<span>${opt}</span>`;
+    btn.addEventListener("click", () => answer(opt, correctText, btn));
+    optsEl.appendChild(btn);
+  });
+}
+
+function makeQuote(c) {
+  const quotes = {
+    "Anby Demara": "I learned this technique from Episode 7 of Bonus Time Heroes.",
+    "Nicole Demara": "Boss out, peasants. We're cashing the contract first.",
+    "Billy Kid": "A justice hero never takes off his hat indoors. Or outdoors. Or ever.",
+    "Nekomata": "Hehe~ caught you slacking, Boss!",
+    "Soldier 11": "Mission parameters: acquire eggs. Estimated time on target: nine minutes.",
+    "Corin Wickes": "I— I'm so sorry! Mr. Cuddles isn't usually this loud!",
+    "Anton Ivanov": "Comrade! Drill goes BRRR!",
+    "Ben Bigger": "Tea is ready. Sit. Eat. Then you may continue panicking.",
+    "Koleda Belobog": "I am NOT short, I am compact and combat-efficient!",
+    "Grace Howard": "If you sleep, you can't fix the prototype. So you don't sleep.",
+    "Lucy Montesanto": "Boys, attack! Honorary command from Lady Lucy~",
+    "Piper Wheel": "Sweetie, baby, do your thing!",
+    "Caesar King": "If you're hurt, get behind me. Now.",
+    "Burnice White": "Some problems just need a little kerosene, sweet pea.",
+    "Lighter Ren": "Stand up. One more round. You've got this, kid.",
+    "Zhu Yuan": "Public Security Section 6, Captain Zhu. Lower your weapon.",
+    "Qingyi": "Acquired. Compiled. Resolved.",
+    "Jane Doe": "Oh sweetie, you have NO idea who you're talking to.",
+    "Seth Lowell": "Stay behind me, Senior Jane! I— I mean, please!",
+    "Soukaku": "Soukaku is hungry. Soukaku will fight. Soukaku must be fed.",
+    "Ellen Joe": "Mn. Five more minutes... ten max.",
+    "Lycaon": "Master, may I ask that you take a step back?",
+    "Astra Yao": "Are you ready to vibe, my little fans?",
+    "Evelyn Chevalier": "Confirm targets. Engage. Withdraw. In that order.",
+    "Yanagi": "I had hoped this could be settled without bloodshed.",
+    "Miyabi Hoshimi": "Submit, or be cut down. There is no third path.",
+    "Harumasa Aoi": "Ah man, did I oversleep again? ...don't answer that.",
+    "Trigger": "Target acquired. Permission to engage.",
+    "Hugo Vlad": "An interesting move. Predictable, but interesting.",
+    "Vivian Banshee": "Sing for me, darling. One last verse.",
+    "Pulchra Fellini": "Mn. Cleaning up. As usual.",
+    "Ju Fufu": "Sister, drumroll! It's lion-dance time!",
+    "Yuzuha Hibiscus": "Please, do enjoy the tea. It will be your last cup if you misbehave.",
+    "Yixuan": "One stroke. One outcome. Watch closely.",
+    "Pan Yinhu": "Hahaha! Is that all you've got, little one?",
+    "Magus": "What you call reality is merely the page before the next one."
+  };
+  return quotes[c.name] || `I am ${c.name}, of ${FACTIONS[c.faction]}.`;
+}
+
+function pickOptions(pool, correct) {
+  const distractors = pool.filter(x => x !== correct).sort(()=>Math.random()-0.5).slice(0,3);
+  return [correct, ...distractors].sort(()=>Math.random()-0.5);
+}
+
+function answer(chosen, correct, btn) {
+  const buttons = document.querySelectorAll("#options .option");
+  buttons.forEach(b => b.disabled = true);
+  const fb = document.getElementById("feedback");
+  state.qCount++;
+  // Reveal silhouette on answer
+  document.querySelectorAll(".clue-portrait.silhouette").forEach(n => {
+    n.classList.remove("silhouette");
+    const meta = n.querySelector(".meta");
+    if (meta && state.currentChar) {
+      meta.innerHTML = `<strong>${state.currentChar.name}</strong><br>${FACTIONS[state.currentChar.faction]} · ${state.currentChar.attribute} · ${state.currentChar.spec}`;
+    }
+  });
+  if (chosen === correct) {
+    btn.classList.add("correct");
+    state.ss = Math.min(100, state.ss + Math.floor(15 + Math.random()*8));
+    state.correct++;
+    state.totalScore += 10;
+    fb.classList.add("show","right");
+    document.getElementById("fbTitle").textContent = "✅ Correct!";
+    document.getElementById("fbBody").textContent = `${correct} — that's the agent. +10 pts and SmartScore +${Math.floor(15+Math.random()*8)}.`;
+  } else {
+    btn.classList.add("wrong");
+    buttons.forEach(b => {
+      if (b.querySelector("span:last-child").textContent === correct) b.classList.add("correct");
+    });
+    state.ss = Math.max(0, state.ss - 10);
+    fb.classList.add("show","wrong");
+    document.getElementById("fbTitle").textContent = "❌ Not quite.";
+    document.getElementById("fbBody").textContent = `The correct answer was: ${correct}. SmartScore -10. ZXL never forgets.`;
+  }
+  saveProgress();
+  updateSmartScore();
+  if (state.ss >= 100) markMastered();
+  document.getElementById("totalScore").textContent = state.totalScore;
+}
+
+function updateSmartScore() {
+  document.getElementById("ssValue").textContent = state.ss;
+  document.getElementById("ssFill").style.width = state.ss + "%";
+}
+
+function nextQuestion() {
+  state.qNum++;
+  // Pick a new character for variety while keeping the same skill type
+  if (state.currentMode === "identify" || state.currentMode === "quote" || state.currentMode === "faction") {
+    state.currentChar = CHARACTERS[Math.floor(Math.random()*CHARACTERS.length)];
+  } else {
+    // attribute/weapon: rotate within faction for thematic feel
+    const sameFaction = CHARACTERS.filter(c => c.faction === state.currentChar.faction);
+    state.currentChar = sameFaction[Math.floor(Math.random()*sameFaction.length)];
+  }
+  loadQuestion();
+}
+
+function markMastered() {
+  if (!state.currentSkill) return;
+  if (!state.mastered.includes(state.currentSkill)) {
+    state.mastered.push(state.currentSkill);
+    saveProgress();
+    grantAward("first-master");
+    if (state.mastered.length >= 5) grantAward("five-masters");
+    if (state.mastered.length >= 15) grantAward("fifteen-masters");
+    if (state.mastered.length >= CHARACTERS.length) grantAward("dex-complete");
+  }
+  showModal("🏆", "Skill Mastered!", `You hit a SmartScore of 100 on ${state.currentChar.name}. Onward, Proxy.`);
+}
+
+// -------- Awards --------
+const ALL_AWARDS = [
+  { id:"first-correct", name:"First Light", icon:"🌟", desc:"Answered your first question correctly." },
+  { id:"first-master",  name:"Skill Master I", icon:"🥉", desc:"Mastered a skill (SmartScore 100)." },
+  { id:"five-masters",  name:"Skill Master II", icon:"🥈", desc:"Mastered 5 skills." },
+  { id:"fifteen-masters", name:"Skill Master III", icon:"🥇", desc:"Mastered 15 skills." },
+  { id:"dex-complete",  name:"Bangboo Dex", icon:"📚", desc:"Mastered every character." },
+  { id:"streak-3",      name:"Hot Streak", icon:"🔥", desc:"3 correct answers in a row." },
+  { id:"diagnostic",    name:"Diagnosed", icon:"🧠", desc:"Completed your first Diagnostic." },
+  { id:"all-factions",  name:"New Eridu Native", icon:"🏙️", desc:"Answered a question from every faction." },
+  { id:"speedrun",      name:"Bangboo Speedrun", icon:"⏱️", desc:"Mastered a skill in under 3 minutes." },
+  { id:"100-points",    name:"Centurion", icon:"💯", desc:"Earned 100 total points." },
+];
+
+function grantAward(id) {
+  if (state.awards.includes(id)) return;
+  state.awards.push(id);
+  saveProgress();
+  const a = ALL_AWARDS.find(x => x.id === id);
+  if (a) showModal(a.icon, "Award unlocked!", `${a.name} — ${a.desc}`);
+}
+
+function renderAwards() {
+  const grid = document.getElementById("awardsGrid");
+  grid.innerHTML = "";
+  ALL_AWARDS.forEach(a => {
+    const div = document.createElement("div");
+    div.className = "award" + (state.awards.includes(a.id) ? "" : " locked");
+    div.innerHTML = `
+      <div class="award-icon">${a.icon}</div>
+      <div class="award-name">${a.name}</div>
+      <div class="award-desc">${a.desc}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+// -------- Analytics --------
+function renderAnalytics() {
+  document.getElementById("aQA").textContent = state.qCount;
+  document.getElementById("aCorrect").textContent = state.correct;
+  document.getElementById("aAcc").textContent = state.qCount ? Math.round(100*state.correct/state.qCount) + "%" : "—";
+  document.getElementById("aMastered").textContent = state.mastered.length;
+}
+
+// -------- Recommendations --------
+function renderRecommendations() {
+  const list = document.getElementById("recList");
+  list.innerHTML = "";
+  // Suggest 6 unmastered skills at random
+  const unmastered = [];
+  CHARACTERS.forEach(c => {
+    SKILL_CATS.forEach(cat => {
+      const id = `${c.faction}|${c.name}|${cat.id}`;
+      if (!state.mastered.includes(id)) unmastered.push({ char:c, cat });
+    });
+  });
+  unmastered.sort(()=>Math.random()-0.5).slice(0,6).forEach(({char, cat}) => {
+    const row = document.createElement("div");
+    row.className = "skill-row";
+    row.innerHTML = `
+      <span class="skill-code">★</span>
+      <span class="skill-link">${cat.label}: ${char.name} (${FACTIONS[char.faction]})</span>
+      <span class="skill-medal">⚪</span>
+    `;
+    row.querySelector(".skill-link").addEventListener("click", () => startSkill(char, cat.id, "REC"));
+    list.appendChild(row);
+  });
+}
+
+// -------- Diagnostic --------
+function startDiagnostic() {
+  // 10 random questions, identify mode
+  state.currentMode = "identify";
+  state.currentChar = CHARACTERS[Math.floor(Math.random()*CHARACTERS.length)];
+  state.currentSkill = "DIAGNOSTIC";
+  state.ss = 0;
+  state.qNum = 1;
+  document.getElementById("qTitle").textContent = "Diagnostic Snapshot — 10 questions";
+  document.getElementById("qSubtitle").textContent = "Adaptive evaluation across all factions.";
+  showPage("quiz");
+  loadQuestion();
+  grantAward("diagnostic");
+}
+
+// -------- Modal --------
+function showModal(icon, title, body) {
+  document.getElementById("modalIcon").textContent = icon;
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalBody").textContent = body;
+  document.getElementById("modalBg").classList.add("show");
+}
+function closeModal() {
+  document.getElementById("modalBg").classList.remove("show");
+}
+
+// -------- Persistence --------
+function saveProgress() {
+  localStorage.setItem("zxl_score", state.totalScore);
+  localStorage.setItem("zxl_mastered", JSON.stringify(state.mastered));
+  localStorage.setItem("zxl_awards", JSON.stringify(state.awards));
+}
+
+// -------- Init --------
+document.getElementById("totalScore").textContent = state.totalScore;
+renderSkills();
+</script>
 </body>
 </html>
