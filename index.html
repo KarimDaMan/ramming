@@ -369,6 +369,33 @@
   .option.correct .option-letter { background: var(--ixl-green); color: white; }
   .option.wrong .option-letter { background: var(--ixl-red); color: white; }
 
+  .portrait {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-size: cover;
+    background-position: center;
+  }
+  .portrait.lg { width: 140px; height: 140px; border-radius: 12px; }
+  .portrait.sm { width: 36px; height: 36px; border-radius: 6px; }
+  .clue-portrait {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed #e8d4a0;
+  }
+  .clue-portrait.silhouette .portrait { filter: brightness(0) saturate(100%); }
+  .clue-portrait .meta {
+    flex: 1;
+    font-size: 13px;
+    color: #555;
+  }
+  .clue-portrait .meta strong { color: #333; }
+
   .feedback {
     margin-top: 20px;
     padding: 16px 20px;
@@ -875,6 +902,67 @@ const CHARACTERS = [
   ]}
 ];
 
+// -------- Portrait generator (stylized SVG, no copyrighted art) --------
+const ATTR_COLORS = {
+  "Electric":  ["#fff269", "#ffae00"],
+  "Fire":      ["#ff8a4f", "#c1272d"],
+  "Ice":       ["#a8eaff", "#2196f3"],
+  "Physical":  ["#f0f0f0", "#9e9e9e"],
+  "Ether":     ["#e6a8ff", "#7b1fa2"],
+  "Frost":     ["#cfe9ff", "#3f51b5"],
+  "Auric Ink": ["#ffe6a8", "#b8860b"]
+};
+const ATTR_GLYPH = {
+  "Electric":"⚡","Fire":"🔥","Ice":"❄","Physical":"✊","Ether":"✦","Frost":"❅","Auric Ink":"墨"
+};
+const FACTION_CREST = {
+  cunning:"🐰", belobog:"🔨", victoria:"🧹", calydon:"🏍", cid:"🛡",
+  sec6:"⑥", lyra:"⭐", mockingbird:"🐦", spook:"👻", hollows:"⚫"
+};
+
+function initials(name) {
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+}
+
+function portraitSVG(char) {
+  const [c1, c2] = ATTR_COLORS[char.attribute] || ["#ddd","#888"];
+  const ini = initials(char.name);
+  const glyph = ATTR_GLYPH[char.attribute] || "";
+  const crest = FACTION_CREST[char.faction] || "";
+  const seed = char.name.charCodeAt(0) + char.name.charCodeAt(1 % char.name.length);
+  const angle = (seed % 90) - 45;
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
+    <defs>
+      <linearGradient id='g${seed}' x1='0' y1='0' x2='1' y2='1'>
+        <stop offset='0%' stop-color='${c1}'/>
+        <stop offset='100%' stop-color='${c2}'/>
+      </linearGradient>
+      <radialGradient id='r${seed}' cx='30%' cy='30%' r='70%'>
+        <stop offset='0%' stop-color='rgba(255,255,255,0.5)'/>
+        <stop offset='100%' stop-color='rgba(255,255,255,0)'/>
+      </radialGradient>
+    </defs>
+    <rect width='200' height='200' fill='url(#g${seed})'/>
+    <circle cx='100' cy='100' r='160' fill='url(#r${seed})'/>
+    <g transform='rotate(${angle} 100 100)' opacity='0.18'>
+      <rect x='-40' y='80' width='280' height='40' fill='white'/>
+    </g>
+    <text x='100' y='120' font-family='Arial Black, sans-serif' font-size='86' font-weight='900'
+          fill='white' text-anchor='middle' stroke='rgba(0,0,0,0.25)' stroke-width='2'>${ini}</text>
+    <text x='22' y='40' font-size='28' fill='white' opacity='0.9'>${glyph}</text>
+    <text x='178' y='40' font-size='24' fill='white' opacity='0.9' text-anchor='end'>${crest}</text>
+    <text x='100' y='180' font-family='Arial' font-size='14' fill='white' opacity='0.85'
+          text-anchor='middle' font-weight='700' letter-spacing='1'>${char.attribute.toUpperCase()}</text>
+  </svg>`;
+  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+}
+
+function portraitDiv(char, cls="") {
+  return `<div class="portrait ${cls}" style="background-image:url('${portraitSVG(char)}')" role="img" aria-label="${char.name} portrait"></div>`;
+}
+
 // -------- Skills (one per character clustered into categories) --------
 const FACTIONS = {
   all: "All Factions",
@@ -967,6 +1055,7 @@ function renderSkills(grade="all") {
         const mastered = state.mastered.includes(id);
         row.innerHTML = `
           <span class="skill-code">${code}</span>
+          ${portraitDiv(c, "sm")}
           <span class="skill-link">${cat.label}: ${c.name.split(" ")[0]}</span>
           <span class="skill-medal ${mastered ? "earned" : ""}" title="${mastered?"Mastered":"Not yet mastered"}">${mastered ? "🏅" : "⚪"}</span>
         `;
@@ -1015,17 +1104,22 @@ function loadQuestion() {
   fb.classList.remove("show","right","wrong");
   optsEl.innerHTML = "";
   clueEl.innerHTML = "";
+  document.querySelectorAll(".clue-card .clue-portrait").forEach(n => n.remove());
   document.getElementById("qNum").textContent = state.qNum;
 
   // Build clues + options based on mode
   let clueText = [];
   let correctText = "";
   let options = [];
+  let showPortraitInClue = false;
+  let silhouette = false;
 
   if (mode === "identify") {
     clueText = c.clues.slice();
     correctText = c.name;
     options = pickOptions(CHARACTERS.map(x => x.name), c.name);
+    showPortraitInClue = true;
+    silhouette = true;
   } else if (mode === "attribute") {
     clueText = [
       `This character is known as ${c.name}.`,
@@ -1035,6 +1129,7 @@ function loadQuestion() {
     correctText = c.attribute;
     const all = ["Electric","Fire","Ice","Physical","Ether","Frost","Auric Ink"];
     options = pickOptions(all, c.attribute);
+    showPortraitInClue = true;
   } else if (mode === "weapon") {
     clueText = [
       `Character: ${c.name}.`,
@@ -1043,10 +1138,13 @@ function loadQuestion() {
     ];
     correctText = c.weapon;
     options = pickOptions(CHARACTERS.map(x=>x.weapon).filter((v,i,a)=>a.indexOf(v)===i), c.weapon);
+    showPortraitInClue = true;
   } else if (mode === "faction") {
     clueText = c.clues.slice();
     correctText = FACTIONS[c.faction];
     options = pickOptions(Object.values(FACTIONS).filter(v => v !== "All Factions"), FACTIONS[c.faction]);
+    showPortraitInClue = true;
+    silhouette = true;
   } else if (mode === "quote") {
     const quote = makeQuote(c);
     clueText = [
@@ -1056,6 +1154,16 @@ function loadQuestion() {
     ];
     correctText = c.name;
     options = pickOptions(CHARACTERS.map(x => x.name), c.name);
+  }
+
+  if (showPortraitInClue) {
+    const meta = silhouette
+      ? `<strong>Unknown agent</strong><br>Silhouette analysis only. Reveal pending answer.`
+      : `<strong>${c.name}</strong><br>${FACTIONS[c.faction]} · ${c.attribute} · ${c.spec}`;
+    const wrap = document.createElement("div");
+    wrap.className = "clue-portrait" + (silhouette ? " silhouette" : "");
+    wrap.innerHTML = `${portraitDiv(c,"lg")}<div class="meta">${meta}</div>`;
+    clueEl.parentElement.insertBefore(wrap, clueEl);
   }
 
   clueText.forEach(t => {
@@ -1069,7 +1177,9 @@ function loadQuestion() {
   options.forEach((opt, i) => {
     const btn = document.createElement("button");
     btn.className = "option";
-    btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span>${opt}</span>`;
+    const charForOpt = CHARACTERS.find(x => x.name === opt);
+    const portrait = charForOpt ? portraitDiv(charForOpt) : "";
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span>${portrait}<span>${opt}</span>`;
     btn.addEventListener("click", () => answer(opt, correctText, btn));
     optsEl.appendChild(btn);
   });
@@ -1127,6 +1237,14 @@ function answer(chosen, correct, btn) {
   buttons.forEach(b => b.disabled = true);
   const fb = document.getElementById("feedback");
   state.qCount++;
+  // Reveal silhouette on answer
+  document.querySelectorAll(".clue-portrait.silhouette").forEach(n => {
+    n.classList.remove("silhouette");
+    const meta = n.querySelector(".meta");
+    if (meta && state.currentChar) {
+      meta.innerHTML = `<strong>${state.currentChar.name}</strong><br>${FACTIONS[state.currentChar.faction]} · ${state.currentChar.attribute} · ${state.currentChar.spec}`;
+    }
+  });
   if (chosen === correct) {
     btn.classList.add("correct");
     state.ss = Math.min(100, state.ss + Math.floor(15 + Math.random()*8));
